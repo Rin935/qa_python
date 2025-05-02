@@ -25,16 +25,27 @@ class TestBooksCollector:
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
 
-    @pytest.fixture
-    def collector(self):
-        return BooksCollector()
 
-    def test_add_new_book_valid_name(self, collector):
+    def test_add_new_book_add_two_books(self):
+        collector = BooksCollector()
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+        assert len(collector.books_genre) == 2
+
+    def test_add_new_book_valid_name(self):
+        collector = BooksCollector()
         collector.add_new_book("Цветы для Элджернона")
         assert "Цветы для Элджернона" in collector.books_genre
 
+    def test_add_new_book_name_length_boundary(self):
+        collector = BooksCollector()
+        collector.add_new_book("A" * 40)
+        assert "A" * 40 in collector.books_genre
+        collector.add_new_book("A" * 41)
+        assert "A" * 41 not in collector.books_genre
 
-    def test_add_new_book_duplicate(self, collector):
+    def test_add_new_book_duplicate(self):
+        collector = BooksCollector()
         collector.add_new_book("Унесённые ветром")
         collector.add_new_book("Унесённые ветром")
         assert len(collector.books_genre) == 1
@@ -46,21 +57,25 @@ class TestBooksCollector:
             "Две мелодии сердца. Путеводитель оптимистки с разбитым сердцем"
         ]
     )
-    def test_add_new_book_invalid_name(self, collector, name):
+    def test_add_new_book_invalid_name(self, name):
+        collector = BooksCollector()
         collector.add_new_book(name)
         assert name not in collector.books_genre
 
-    def test_set_book_genre_valid(self, collector):
+    def test_set_book_genre_valid(self):
+        collector = BooksCollector()
         collector.add_new_book("Зов Ктулху")
         collector.set_book_genre("Зов Ктулху", "Ужасы")
         assert collector.get_book_genre("Зов Ктулху") == "Ужасы"
 
-    def test_set_book_genre_invalid_genre(self, collector):
+    def test_set_book_genre_invalid_genre(self):
+        collector = BooksCollector()
         collector.add_new_book("Население: одна")
         collector.set_book_genre("Население: одна", "Хоррор")
         assert collector.get_book_genre("Население: одна") == ""
 
-    def test_get_books_for_children(self, collector):
+    def test_get_books_for_children(self):
+        collector = BooksCollector()
         collector.add_new_book("Дядя Фёдор, пёс и кот")
         collector.set_book_genre("Дядя Фёдор, пёс и кот", "Мультфильмы")
         collector.add_new_book("Зов Ктулху")
@@ -69,17 +84,20 @@ class TestBooksCollector:
         assert "Дядя Фёдор, пёс и кот" in children_books
         assert "Зов Ктулху" not in children_books
 
-    def test_add_book_in_favorites(self, collector):
+    def test_add_book_in_favorites(self):
+        collector = BooksCollector()
         collector.add_new_book("Война и мир")
         collector.add_book_in_favorites("Война и мир")
         assert "Война и мир" in collector.get_list_of_favorites_books()
 
-    def test_add_book_in_favorites_not_in_books_genre(self, collector):
+    def test_add_book_in_favorites_not_in_books_genre(self):
+        collector = BooksCollector()
         collector.add_book_in_favorites("Такой книги нет")
         assert "Такой книги нет" not in collector.get_list_of_favorites_books()
 
-    def test_delete_book_from_favorites(self, collector):
-        collector.add_new_book("Униженные и оскоблённые")
-        collector.add_book_in_favorites("Униженные и оскоблённые")
-        collector.delete_book_from_favorites("Униженные и оскоблённые")
-        assert "Униженные и оскоблённые" not in collector.get_list_of_favorites_books()
+    def test_delete_book_from_favorites(self):
+        collector = BooksCollector()
+        collector.add_new_book("Униженные и оскорблённые")
+        collector.add_book_in_favorites("Униженные и оскорблённые")
+        collector.delete_book_from_favorites("Униженные и оскорблённые")
+        assert "Униженные и оскорблённые" not in collector.get_list_of_favorites_books()
