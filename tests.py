@@ -37,12 +37,17 @@ class TestBooksCollector:
         collector.add_new_book("Цветы для Элджернона")
         assert "Цветы для Элджернона" in collector.books_genre
 
-    def test_add_new_book_name_length_boundary(self):
+    def test_add_new_book_with_max_length_name(self, collector):
         collector = BooksCollector()
-        collector.add_new_book("A" * 40)
-        assert "A" * 40 in collector.books_genre
-        collector.add_new_book("A" * 41)
-        assert "A" * 41 not in collector.books_genre
+        max_length_name = "A" * 40
+        collector.add_new_book(max_length_name)
+        assert max_length_name in collector.books_genre
+
+    def test_add_new_book_rejects_too_long_name(self, collector):
+        collector = BooksCollector()
+        too_long_name = "A" * 41
+        collector.add_new_book(too_long_name)
+        assert too_long_name not in collector.books_genre
 
     def test_add_new_book_duplicate(self):
         collector = BooksCollector()
