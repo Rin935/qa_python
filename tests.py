@@ -1,3 +1,5 @@
+import pytest
+
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -22,3 +24,85 @@ class TestBooksCollector:
 
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+
+
+    def test_add_new_book_add_two_books(self):
+        collector = BooksCollector()
+        collector.add_new_book('Гордость и предубеждение и зомби')
+        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+        assert len(collector.books_genre) == 2
+
+    def test_add_new_book_valid_name(self):
+        collector = BooksCollector()
+        collector.add_new_book("Цветы для Элджернона")
+        assert "Цветы для Элджернона" in collector.books_genre
+
+    def test_add_new_book_with_max_length_name(self, collector):
+        collector = BooksCollector()
+        max_length_name = "A" * 40
+        collector.add_new_book(max_length_name)
+        assert max_length_name in collector.books_genre
+
+    def test_add_new_book_rejects_too_long_name(self, collector):
+        collector = BooksCollector()
+        too_long_name = "A" * 41
+        collector.add_new_book(too_long_name)
+        assert too_long_name not in collector.books_genre
+
+    def test_add_new_book_duplicate(self):
+        collector = BooksCollector()
+        collector.add_new_book("Унесённые ветром")
+        collector.add_new_book("Унесённые ветром")
+        assert len(collector.books_genre) == 1
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "",
+            "Две мелодии сердца. Путеводитель оптимистки с разбитым сердцем"
+        ]
+    )
+    def test_add_new_book_invalid_name(self, name):
+        collector = BooksCollector()
+        collector.add_new_book(name)
+        assert name not in collector.books_genre
+
+    def test_set_book_genre_valid(self):
+        collector = BooksCollector()
+        collector.add_new_book("Зов Ктулху")
+        collector.set_book_genre("Зов Ктулху", "Ужасы")
+        assert collector.get_book_genre("Зов Ктулху") == "Ужасы"
+
+    def test_set_book_genre_invalid_genre(self):
+        collector = BooksCollector()
+        collector.add_new_book("Население: одна")
+        collector.set_book_genre("Население: одна", "Хоррор")
+        assert collector.get_book_genre("Население: одна") == ""
+
+    def test_get_books_for_children(self):
+        collector = BooksCollector()
+        collector.add_new_book("Дядя Фёдор, пёс и кот")
+        collector.set_book_genre("Дядя Фёдор, пёс и кот", "Мультфильмы")
+        collector.add_new_book("Зов Ктулху")
+        collector.set_book_genre("Зов Ктулху", "Ужасы")
+        children_books = collector.get_books_for_children()
+        assert "Дядя Фёдор, пёс и кот" in children_books
+        assert "Зов Ктулху" not in children_books
+
+    def test_add_book_in_favorites(self):
+        collector = BooksCollector()
+        collector.add_new_book("Война и мир")
+        collector.add_book_in_favorites("Война и мир")
+        assert "Война и мир" in collector.get_list_of_favorites_books()
+
+    def test_add_book_in_favorites_not_in_books_genre(self):
+        collector = BooksCollector()
+        collector.add_book_in_favorites("Такой книги нет")
+        assert "Такой книги нет" not in collector.get_list_of_favorites_books()
+
+    def test_delete_book_from_favorites(self):
+        collector = BooksCollector()
+        collector.add_new_book("Униженные и оскорблённые")
+        collector.add_book_in_favorites("Униженные и оскорблённые")
+        collector.delete_book_from_favorites("Униженные и оскорблённые")
+        assert "Униженные и оскорблённые" not in collector.get_list_of_favorites_books()
